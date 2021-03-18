@@ -16,16 +16,21 @@ function asyncHandler(cb){
     }
   }
 
+  router.get('/', (req, res) => {
+    res.json({
+        message: 'Welcome to the REST API project!',
+    });
+  });
+
   // Route that returns the current authenticated user.
   //NEED AUTHENTICATION HERE
 router.get('/users', asyncHandler(async (req, res) => {
     const user = req.currentUser;
   
-    res.json({
+    res.status(201).json({
       firstName: user.firstName,
       lastName: user.lastName,
-      emailAddress: user.emailAddress,
-      password: user.password
+      emailAddress: user.emailAddress
     });
     
   }));
