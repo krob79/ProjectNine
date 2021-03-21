@@ -12,6 +12,9 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 // create the Express app
 const app = express();
 
+// Set up request body JSON parsing.
+app.use(express.json());
+
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 
@@ -52,8 +55,18 @@ app.set('port', process.env.PORT || 5000);
   try {
     await sequelize.authenticate();
     console.log('****Connection has been established successfully!');
+
+    //sync the models
+    await sequelize.sync();
   } catch (error) {
     console.error('****Unable to connect to the database:', error);
+    if(error.name === 'SequelizeValidationError'){
+      const errors = error.errors.map(err => err.message);
+      console.error('Validation errors: ' + errors);
+    }else{
+      throw error;
+    }
+    
   }
 })();
 
@@ -61,3 +74,5 @@ app.set('port', process.env.PORT || 5000);
 const server = app.listen(app.get('port'), () => {
   console.log(`Express server is listening on port ${server.address().port}`);
 });
+
+module.exports = app;

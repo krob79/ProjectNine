@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models').User;
+// Middlware function to authenticate a user
+const { authenticateUser } = require('../middleware/auth-user');
 
 const users = [];
 
@@ -14,7 +16,7 @@ function asyncHandler(cb){
         next(error);
       }
     }
-  }
+}
 
   router.get('/', (req, res) => {
     res.json({
@@ -22,12 +24,11 @@ function asyncHandler(cb){
     });
   });
 
-  // Route that returns the current authenticated user.
-  //NEED AUTHENTICATION HERE
-router.get('/users', asyncHandler(async (req, res) => {
+// Route that returns the current authenticated user.
+router.get('/users', authenticateUser, asyncHandler(async (req, res) => {
     const user = req.currentUser;
   
-    res.status(201).json({
+    res.status(200).json({
       firstName: user.firstName,
       lastName: user.lastName,
       emailAddress: user.emailAddress
@@ -35,6 +36,7 @@ router.get('/users', asyncHandler(async (req, res) => {
     
   }));
 
+// route that creates new user
 router.post('/users', asyncHandler(async(req, res) => {
   console.log("---body " + req.body);
   try{
@@ -53,5 +55,7 @@ router.post('/users', asyncHandler(async(req, res) => {
 
 
 }));
+
+router.get('/courses')
 
 module.exports = router;
