@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models').User;
+const Course = require('../models').Course;
 // Middlware function to authenticate a user
 const { authenticateUser } = require('../middleware/auth-user');
 
@@ -56,6 +57,58 @@ router.post('/users', asyncHandler(async(req, res) => {
 
 }));
 
-router.get('/courses')
+// Send a GET request to /courses to READ a list of courses
+router.get('/courses', asyncHandler(async (req, res)=>{
+  const courses = await Course.findAll({
+    include:[{
+      model: User,
+      as:'owner',
+      attributes:['id','firstName','lastName','emailAddress']
+    }],
+    attributes: ['id', 'title', 'description', 'estimatedTime', 'materialsNeeded']
+  });
+  console.log(courses);
+  res.json(courses);
+}));
+
+// Send a GET request to /courses/(id) to READ a course of a specific id
+router.get('/courses/:id', asyncHandler(async (req, res)=>{
+
+  const courses = await Course.findByPk(req.params.id, {
+    include:[{
+      model: User,
+      as:'owner',
+      attributes:['id','firstName','lastName','emailAddress']
+    }],
+    // Filter results returning only certain columns
+    attributes: ['id','title', 'description', 'estimatedTime', 'materialsNeeded']
+  });
+
+  if(courses){
+    res.json(courses);
+  } else {
+      res.status(404).json({message: "Course was not found."});
+  }
+}));
+
+// route that creates new course
+router.post('/courses', authenticateUser, asyncHandler(async(req, res) => {
+  try{
+    const course = await Course.create(req.body);
+    res.location(`/courses/${course.id}`);
+    res.status(201).json({message:"Course successfully created!"});
+  }catch(error){
+    console.log("-----Error: " + error.name);
+
+    if(error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError'){
+      const errors = error.errors.map(err => err.message);
+      res.status(400).json({errors});
+    }else{
+      throw error;
+    }
+  }
+
+
+}));
 
 module.exports = router;

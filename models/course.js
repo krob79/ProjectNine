@@ -30,42 +30,16 @@ module.exports = (sequelize) => {
 
         },
         estimatedTime:{
-            type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notNull: {
-                    msg: 'An estimated time is required.'
-                },
-                notEmpty: {
-                    msg: 'Please provide an estimated time.'
-                }
-            }
+            type: DataTypes.STRING
         },
         materialsNeeded:{
-            type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notNull: {
-                    msg: 'A list of materials is required.'
-                },
-                notEmpty: {
-                    msg: 'Please provide a list of materials.'
-                }
-            }
-
+            type: DataTypes.STRING
         }
     }, { sequelize });
 
     Course.associate = (models) => {
-        Course.belongsTo(models.User,{
-            as: 'student',
-            foreignKey: {
-                fieldName: 'studentPersonId',
-                allowNull: false
-            }
-
-        });
+        Course.belongsTo(models.User, { as: 'owner', foreignKey: 'userId' } );
     }
-
+    
     return Course;
-}
+};
