@@ -107,7 +107,58 @@ router.post('/courses', authenticateUser, asyncHandler(async(req, res) => {
       throw error;
     }
   }
+}
+));
 
+router.put('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
+  try{
+    const course = await Course.findByPk(req.params.id);
+    if(course){
+      if(course.userId === req.currentUser.id){
+        await course.update(req.body);
+        res.status(204).end();
+      }else{
+        res.status(403).json({"message": "User is not owner of this course."});
+      }
+    }else{
+      res.status(404).json({"message": "This course does not exist."});
+    }
+  }catch(error){
+    console.log("-----Error: " + error.name);
+
+    if(error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError'){
+      const errors = error.errors.map(err => err.message);
+      res.status(400).json({errors});
+    }else{
+      throw error;
+    }
+  }
+
+}));
+
+router.delete('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
+  try{
+    const course = await Course.findByPk(req.params.id);
+    if(course){
+      if(course.userId === req.currentUser.id){
+        await course.destroy();
+        res.status(204).end();
+      }else{
+        res.status(403).json({"message": "User can not delete this course."});
+      }
+    }else{
+      res.status(404).json({"message": "This course does not exist."});
+    }
+  }catch(error){
+    console.log("-----Error: " + error.name);
+
+    if(error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError'){
+      const errors = error.errors.map(err => err.message);
+      res.status(400).json({errors});
+    }else{
+      throw error;
+    }
+  }
 
 }));
 

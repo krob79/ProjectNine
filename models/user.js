@@ -1,6 +1,6 @@
 'user strict';
 const { Model, DataTypes } = require('sequelize');
-const bcrypt = require('bcrypt');
+const bcryptjs = require('bcryptjs');
 
 module.exports = (sequelize) => {
     class User extends Model{}
@@ -70,7 +70,7 @@ module.exports = (sequelize) => {
     // Hash password before it is persisted in DB
     User.addHook(
         "beforeCreate",
-        user => (user.password = bcrypt.hashSync(user.password, 10))
+        user => (user.password = bcryptjs.hashSync(user.password, 10))
     );
 
     User.associate = (models) => {

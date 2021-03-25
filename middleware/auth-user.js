@@ -2,7 +2,7 @@
 
 const auth = require('basic-auth');
 const { User } = require('../models');
-const bcrypt = require('bcrypt');
+const bcryptjs = require('bcryptjs');
 
 // Middleware to authenticate the request using Basic Authentication.
 exports.authenticateUser = async (req, res, next) => {
@@ -22,7 +22,7 @@ exports.authenticateUser = async (req, res, next) => {
         // that was retrieved from the data store.
         if(user){
             console.log(`Compare credentials.pass - ${credentials.pass} - with user.confirmedPassword - ${user.password}`);
-            const authenticated = bcrypt
+            const authenticated = bcryptjs
             .compareSync(credentials.pass, user.password);
             // If the passwords match...
             // Store the retrieved user object on the request object
