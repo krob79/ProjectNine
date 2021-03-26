@@ -21,7 +21,7 @@ function asyncHandler(cb){
 
   router.get('/', (req, res) => {
     res.json({
-        message: 'Welcome to the REST API project!',
+        message: "Welcome to Kyle's REST API project!",
     });
   });
 
@@ -42,6 +42,7 @@ router.post('/users', asyncHandler(async(req, res) => {
   console.log("---body " + req.body);
   try{
     await User.create(req.body);
+    res.location(`/`);
     res.status(201).json({message:"User successfully created!"});
   }catch(error){
     console.log("Error: " + error.name);

@@ -24,7 +24,7 @@ app.use('/api', routes);
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
   res.json({
-    message: 'Welcome to the REST API project!',
+    message: "Welcome to Kyle's REST API project!",
   });
 });
 
@@ -54,12 +54,16 @@ app.set('port', process.env.PORT || 5000);
 (async () => {
   try {
     await sequelize.authenticate();
-    console.log('****Connection has been established successfully!');
+    console.log('\x1b[32m%s\x1b[0m', '***********************************************');
+    console.log('\x1b[32m%s\x1b[0m',' Connection has been established successfully!');
+    console.log('\x1b[32m%s\x1b[0m', '***********************************************');
 
     //sync the models
     await sequelize.sync();
   } catch (error) {
-    console.error('****Unable to connect to the database:', error);
+    console.log('\x1b[31m%s\x1b[0m', '***********************************************');
+    console.log('\x1b[31m%s\x1b[0m',' Unable to connect to the database:', error);
+    console.log('\x1b[31m%s\x1b[0m', '***********************************************');
     if(error.name === 'SequelizeValidationError'){
       const errors = error.errors.map(err => err.message);
       console.error('Validation errors: ' + errors);
@@ -72,7 +76,7 @@ app.set('port', process.env.PORT || 5000);
 
 // start listening on our port
 const server = app.listen(app.get('port'), () => {
-  console.log(`Express server is listening on port ${server.address().port}`);
+  console.log('\x1b[32m%s\x1b[0m',`****Express server is listening on port ${server.address().port}`);
 });
 
 module.exports = app;

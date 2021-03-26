@@ -21,14 +21,12 @@ exports.authenticateUser = async (req, res, next) => {
         // (from the Authorization header) to the user's password
         // that was retrieved from the data store.
         if(user){
-            console.log(`Compare credentials.pass - ${credentials.pass} - with user.confirmedPassword - ${user.password}`);
             const authenticated = bcryptjs
             .compareSync(credentials.pass, user.password);
             // If the passwords match...
             // Store the retrieved user object on the request object
             // so any middleware functions that follow this middleware function
             // will have access to the user's information.
-            console.log(`credentials.pass: ${credentials.pass} user.password: ${user.password}`);
             if(authenticated){
                 console.log(`Authentication successful for username: ${user.emailAddress}`);
                 // Store the user on the Request object.
