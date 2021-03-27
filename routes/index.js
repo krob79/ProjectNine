@@ -32,7 +32,8 @@ router.get('/users', authenticateUser, asyncHandler(async (req, res) => {
     res.status(200).json({
       firstName: user.firstName,
       lastName: user.lastName,
-      emailAddress: user.emailAddress
+      emailAddress: user.emailAddress,
+      id: user.id
     });
     
   }));
@@ -54,8 +55,6 @@ router.post('/users', asyncHandler(async(req, res) => {
       throw error;
     }
   }
-
-
 }));
 
 // Send a GET request to /courses to READ a list of courses
@@ -63,6 +62,9 @@ router.get('/courses', asyncHandler(async (req, res)=>{
   const courses = await Course.findAll({
     include:[{
       model: User,
+      /*EX: will return "owner": {"id": 1, "firstName": "Joe", "lastName": "Smith", "emailAddress": "joe@smith.com"}
+        as part of course JSON result
+      */
       as:'owner',
       attributes:['id','firstName','lastName','emailAddress']
     }],
@@ -78,6 +80,9 @@ router.get('/courses/:id', asyncHandler(async (req, res)=>{
   const courses = await Course.findByPk(req.params.id, {
     include:[{
       model: User,
+      /*EX: will return "owner": {"id": 1, "firstName": "Joe", "lastName": "Smith", "emailAddress": "joe@smith.com"}
+        as part of course JSON result
+      */
       as:'owner',
       attributes:['id','firstName','lastName','emailAddress']
     }],
@@ -96,7 +101,7 @@ router.get('/courses/:id', asyncHandler(async (req, res)=>{
 router.post('/courses', authenticateUser, asyncHandler(async(req, res) => {
   try{
     const course = await Course.create(req.body);
-    res.location(`/courses/${course.id}`);
+    res.location(`/api/courses/${course.id}`);
     res.status(201).json({message:"Course successfully created!"});
   }catch(error){
     console.log("-----Error: " + error.name);
@@ -113,8 +118,10 @@ router.post('/courses', authenticateUser, asyncHandler(async(req, res) => {
 
 router.put('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
   try{
+    //find id based on what was specified in route params
     const course = await Course.findByPk(req.params.id);
     if(course){
+      //if the userID matches the id of the current authenticated user, update the course
       if(course.userId === req.currentUser.id){
         await course.update(req.body);
         res.status(204).end();
@@ -137,11 +144,12 @@ router.put('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
 
 }));
 
+//route for removing course
 router.delete('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
   try{
     const course = await Course.findByPk(req.params.id);
     if(course){
-      //if the user id referenced in the course matches the logged in user, delete it
+      //if the user id referenced in the course matches the authenticated user, delete it
       if(course.userId === req.currentUser.id){
         await course.destroy();
         res.status(204).end();
