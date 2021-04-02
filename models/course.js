@@ -5,7 +5,7 @@ module.exports = (sequelize) => {
     class Course extends Model{}
     Course.init({
         title:{
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
             validate: {
                 notNull: {
@@ -17,7 +17,7 @@ module.exports = (sequelize) => {
             }
         },
         description:{
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
             validate: {
                 notNull: {
